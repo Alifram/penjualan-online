@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Admin\StockController;
+use App\Http\Controllers\Admin\ShippingServiceController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
@@ -21,27 +23,56 @@ Route::post('/logout', [AuthController::class, 'logout'])
     ->middleware('auth')
     ->name('logout');
 
+// Dashboard Admin
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin', function () {
         return view('admin.dashboard');
     })->name('admin.dashboard');
 });
 
-Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
+// Seluruh halaman manajemen admin
+Route::prefix('admin')
+    ->name('admin.')
+    ->middleware(['auth', 'role:admin'])
+    ->group(function () {
 
-    Route::get('/categories', [CategoryController::class, 'index'])
-        ->name('categories.index');
+        // Manajemen Kategori
+        Route::get('/categories', [CategoryController::class, 'index'])
+            ->name('categories.index');
 
-    Route::post('/categories', [CategoryController::class, 'store'])
-        ->name('categories.store');
+        Route::post('/categories', [CategoryController::class, 'store'])
+            ->name('categories.store');
 
-    Route::put('/categories/{category}', [CategoryController::class, 'update'])
-        ->name('categories.update');
+        Route::put('/categories/{category}', [CategoryController::class, 'update'])
+            ->name('categories.update');
 
-    Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])
-        ->name('categories.destroy');
+        Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])
+            ->name('categories.destroy');
 
-    Route::resource('products', AdminProductController::class)
-        ->except('show');
+        // Manajemen Produk
+        Route::resource('products', AdminProductController::class)
+            ->except('show');
 
-});
+        // Manajemen Stok
+        Route::get('/stock', [StockController::class, 'index'])
+            ->name('stock.index');
+
+        Route::get('/stock/create', [StockController::class, 'create'])
+            ->name('stock.create');
+
+        Route::post('/stock', [StockController::class, 'store'])
+            ->name('stock.store');
+
+        // Manajemen Ekspedisi
+        Route::get('/shipping', [ShippingServiceController::class, 'index'])
+            ->name('shipping.index');
+
+        Route::post('/shipping', [ShippingServiceController::class, 'store'])
+            ->name('shipping.store');
+
+        Route::put('/shipping/{shippingService}', [ShippingServiceController::class, 'update'])
+            ->name('shipping.update');
+
+        Route::delete('/shipping/{shippingService}', [ShippingServiceController::class, 'destroy'])
+            ->name('shipping.destroy');
+    });

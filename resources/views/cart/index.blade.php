@@ -73,7 +73,7 @@
                 Subtotal: Rp{{ number_format($subtotal, 0, ',', '.') }}
             </h3>
 
-            <p>Fitur checkout akan tersedia pada Milestone 6.</p>
+            <a href="{{ route('checkout.index') }}">Lanjut ke Checkout</a>
         </div>
     @endif
 @endsection

@@ -1,19 +1,46 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin</title>
-</head>
-<body>
-    <h1>Dashboard Admin</h1>
+@extends('layouts.admin')
 
-    <p>Selamat datang, {{ auth()->user()->name }}!</p>
-    <p>Anda berhasil masuk sebagai administrator.</p>
+@section('title','Dashboard Admin')
 
-    <form method="POST" action="{{ route('logout') }}">
-        @csrf
-        <button type="submit">Logout</button>
-    </form>
-</body>
-</html>
+@section('content')
+<h1>Dashboard</h1>
+
+<div class="grid">
+    <div class="card">
+        <strong>{{ $productCount }}</strong>
+        <br>Produk
+    </div>
+    <div class="card">
+        <strong>{{ $lowStockCount }}</strong>
+        <br>Stok <= 5
+    </div>
+    <div class="card">
+        <strong>{{ $pendingOrderCount }}</strong>
+        <br>Pesanan Pending
+    </div>
+    <div class="card">
+        <strong>Rp{{ number_format($todaySales, 0, ',', '.') }}</strong>
+        <br>Penjualan Hari Ini
+    </div>
+</div>
+
+<div class="card">
+    <h3>Transaksi Terbaru</h3>
+    <table>
+        <tr>
+            <th>Kode</th>
+            <th>Pelanggan</th>
+            <th>Total</th>
+            <th>Status</th>
+        </tr>
+        @foreach($latestOrders as $order)
+            <tr>
+                <td>{{ $order->code }}</td>
+                <td>{{ $order->user->name }}</td>
+                <td>Rp{{ number_format($order->grand_total, 0, ',', '.') }}</td>
+                <td>{{ $order->status }}</td>
+            </tr>
+        @endforeach
+    </table>
+</div>
+@endsection

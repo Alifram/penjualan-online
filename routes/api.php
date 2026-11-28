@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\CheckoutController;
 use App\Http\Controllers\Api\V1\CustomerOrderController;
 use App\Http\Controllers\Api\V1\ProductController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\V1\Admin\ProductStockController;
 
 Route::prefix('v1')->group(function () {
     Route::get('/products', [ProductController::class, 'index']);
@@ -31,6 +32,7 @@ Route::prefix('v1')->group(function () {
             Route::patch('/orders/{order}/confirm', [AdminOrderController::class, 'confirm']);
             Route::patch('/orders/{order}/status', [AdminOrderController::class, 'updateStatus']);
             Route::patch('/orders/{order}/cancel', [AdminOrderController::class, 'cancel']);
+            Route::get('/products/{product}/stock', [ProductStockController::class, 'show']);
         });
     });
 });

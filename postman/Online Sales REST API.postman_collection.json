@@ -1,0 +1,759 @@
+{
+  "info": {
+    "_postman_id": "61e50e1c-6364-4e23-b818-d234219adf1a",
+    "name": "Online Sales REST API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "41776162",
+    "_collection_link": "https://go.postman.co/collection/41776162-61e50e1c-6364-4e23-b818-d234219adf1a?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Skenario 1 - Membaca Katalog Publik",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/products?ready=1&sort=price_asc",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "products"
+          ],
+          "query": [
+            {
+              "key": "ready",
+              "value": "1"
+            },
+            {
+              "key": "sort",
+              "value": "price_asc"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Skenario 2 - Login Customer",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();\r",
+              "pm.collectionVariables.set('customer_token', json.access_token);\r",
+              "console.log('Customer token berhasil disimpan.');"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "const token = pm.collectionVariables.get('customer_token');\r",
+              "\r",
+              "console.log('Token tersedia:', !!token);\r",
+              "console.log('Panjang token:', token ? token.length : 0);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"email\": \"customer@gmail.com\",\r\n    \"password\": \"password123\",\r\n    \"device_name\": \"Postman Praktikum\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/auth/login",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Skenario 3 - Memeriksa User Login",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "const token = pm.collectionVariables.get('customer_token');\r",
+              "\r",
+              "if (!token) {\r",
+              "    throw new Error('Customer token tidak ditemukan!');\r",
+              "}\r",
+              "\r",
+              "pm.request.headers.upsert({\r",
+              "    key: 'Authorization',\r",
+              "    value: 'Bearer ' + token\r",
+              "});\r",
+              "\r",
+              "console.log('Authorization header berhasil disiapkan.');\r",
+              "console.log('Token tersedia:', !!token);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer 9|KrqGaWBvQ41pAzYg6tcq3DUlQhJ18ZcESMrLfC8382b27982",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/auth/me",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "auth",
+            "me"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Skenario 4 - Checkout melalui JSON",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer 9|KrqGaWBvQ41pAzYg6tcq3DUlQhJ18ZcESMrLfC8382b27982",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"recipient_name\": \"Budi Customer\",\r\n  \"phone\": \"081234567890\",\r\n  \"address\": \"Jl. Praktikum No. 10, Purwokerto\",\r\n  \"shipping_service_id\": 1,\r\n  \"items\": [\r\n    {\r\n      \"product_id\": 2,\r\n      \"quantity\": 2\r\n    }\r\n  ]\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/v1/checkout",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "v1",
+            "checkout"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Skenario 5 - Checkout Role Admin",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer 10|EjsUF6kZiyL44GwuUQ4hRK7lSBEwnEIfyuNuqgoJf9d90a00",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"recipient_name\": \"Budi Customer\",\r\n  \"phone\": \"081234567890\",\r\n  \"address\": \"Jl. Praktikum No. 10, Purwokerto\",\r\n  \"shipping_service_id\": 1,\r\n  \"items\": [\r\n    {\r\n      \"product_id\": 2,\r\n      \"quantity\": 1\r\n    }\r\n  ]\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/v1/checkout",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "v1",
+            "checkout"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Skenario 5.8.3 - Checkout Stok Kurang",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"recipient_name\": \"Budi Customer\",\r\n  \"phone\": \"081234567890\",\r\n  \"address\": \"Jl. Praktikum No. 10, Purwokerto\",\r\n  \"shipping_service_id\": 1,\r\n  \"items\": [\r\n    {\r\n      \"product_id\": 2,\r\n      \"quantity\": 100\r\n    }\r\n  ]\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/v1/checkout",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "v1",
+            "checkout"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Skenario 5.8.4 - Checkout Produk Duplikat",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer 9|KrqGaWBvQ41pAzYg6tcq3DUlQhJ18ZcESMrLfC8382b27982",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"recipient_name\": \"Budi Customer\",\r\n  \"phone\": \"081234567890\",\r\n  \"address\": \"Jl. Praktikum No. 10, Purwokerto\",\r\n  \"shipping_service_id\": 1,\r\n  \"items\": [\r\n    {\r\n      \"product_id\": 2,\r\n      \"quantity\": 1\r\n    },\r\n    {\r\n      \"product_id\": 2,\r\n      \"quantity\": 1\r\n    }\r\n  ]\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/v1/checkout",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "v1",
+            "checkout"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Skenario 5.8.5 - Checkout Ekspedisi Salah",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer 9|KrqGaWBvQ41pAzYg6tcq3DUlQhJ18ZcESMrLfC8382b27982",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/v1/checkout",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "v1",
+            "checkout"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Skenario 5.8.6 - Checkout Field Kosong",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer 10|EjsUF6kZiyL44GwuUQ4hRK7lSBEwnEIfyuNuqgoJf9d90a00",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"recipient_name\": \"\",\r\n  \"phone\": \"081234567890\",\r\n  \"address\": \"Jl. Praktikum No. 10, Purwokerto\",\r\n  \"shipping_service_id\": 1,\r\n  \"items\": [\r\n    {\r\n      \"product_id\": 2,\r\n      \"quantity\": 1\r\n    }\r\n  ]\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/v1/checkout",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "v1",
+            "checkout"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Skenario 5.9.1 - Login Admin",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const response = pm.response.json();\r",
+              "\r",
+              "pm.environment.set(\"admin_token\", response.access_token);\r",
+              "\r",
+              "console.log(\"Admin token berhasil disimpan.\");"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"email\": \"admin@example.com\",\r\n    \"password\": \"Admin12345!\",\r\n    \"device_name\": \"Postman Admin\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/v1/auth/login",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "v1",
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Skenario 5.9.2 - Daftar Order Admin",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "11|WeOnavKrMcdDw9gA7TZOGj4Tgsctv6Cc4KJdJfXT96d0ed6c",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/v1/admin/orders",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "v1",
+            "admin",
+            "orders"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Skenario 5.9.3 - Konfirmasi Order",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "11|WeOnavKrMcdDw9gA7TZOGj4Tgsctv6Cc4KJdJfXT96d0ed6c",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/v1/admin/orders/7/confirm",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "v1",
+            "admin",
+            "orders",
+            "7",
+            "confirm"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Skenario 5.9.4 - Status Processed",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "11|WeOnavKrMcdDw9gA7TZOGj4Tgsctv6Cc4KJdJfXT96d0ed6c",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"status\": \"processed\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/v1/admin/orders/7/status",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "v1",
+            "admin",
+            "orders",
+            "7",
+            "status"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Skenario 5.9.5 - Status Shipped",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/v1/admin/orders/7/status",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "v1",
+            "admin",
+            "orders",
+            "7",
+            "status"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Skenario 5.9.6 - Konflik Status Order",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "11|WeOnavKrMcdDw9gA7TZOGj4Tgsctv6Cc4KJdJfXT96d0ed6c",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"status\": \"shipped\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "customer_token",
+      "value": ""
+    }
+  ]
+}

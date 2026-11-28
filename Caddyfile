@@ -1,0 +1,12 @@
+
+{
+    frankenphp
+}
+
+:{$PORT} {
+    root * /app/public
+
+    encode zstd gzip
+
+    php_server
+}
